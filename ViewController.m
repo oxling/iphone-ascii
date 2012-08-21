@@ -106,13 +106,17 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
                 for (int pxRow=0; pxRow<gridRows; pxRow++) {
                     pixel_t * px = getPixel(data, row*gridRows+pxRow, col*gridCols+pxCol, bytes_per_row);
                     
-                    //Increase the contrast by a lot
-                    
-                    float darkness = 0.2126 * (float)px->r + 0.7152 * (float)px->g + 0.0722 * (float)px->b;
+                    float darkness = 0.2126 * px->r + 0.7152 * px->g + 0.0722 * px->b;
                     sum += darkness/255;
                 }
             }
-            sum = sum/(gridCols * gridRows);
+            
+
+           /* block.r = sum_r/(gridCols*gridRows);
+            block.g = sum_g/(gridCols*gridRows);
+            block.b = sum_b/(gridCols*gridRows); */
+            
+            sum /= gridCols * gridRows;
             
             block.r = sum;
             block.g = sum;

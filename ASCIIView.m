@@ -23,6 +23,7 @@
 - (id) initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.backgroundColor = [UIColor whiteColor];
         [self createTree];
     }
     return self;
@@ -53,16 +54,30 @@
     CGFloat blockHeight = bounds.size.height / _grid.height;
     
     block_t block = [_grid blockAtRow:row col:col];
-    
+    //See wikipedia article on grayscale
+    float darkness = 0.2126 * block.r + 0.7152 * block.g + 0.0722 * block.b;
+    char * letter = findLetter(treeRoot, darkness);
         
     CGContextSetFillColor(ctx, (CGFloat *)&block);
     CGRect rect = CGRectMake(bounds.origin.x + blockWidth * col, bounds.origin.y + blockHeight * row, blockWidth, blockHeight);
     CGContextFillRect(ctx, rect);
     
+    //CGContextShowTextAtPoint(ctx, rect.origin.x, rect.origin.y, letter, strlen(letter));
+    //CGContextFillRect(ctx, rect);
+    
 }
 
 - (void)drawRect:(CGRect)rect {
     CGContextRef ctx = UIGraphicsGetCurrentContext();
+    
+    
+    CGContextSetFillColorWithColor(ctx, self.backgroundColor.CGColor);
+    CGContextFillRect(ctx, self.bounds);
+    CGContextSelectFont(ctx, "Courier", 8.0, kCGEncodingMacRoman);
+    CGContextSetCharacterSpacing(ctx, 1.7);
+    CGContextSetTextDrawingMode(ctx, kCGTextFill);
+    CGAffineTransform transform = CGAffineTransformMake(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
+    CGContextSetTextMatrix(ctx, transform);
     
     for (int x=0; x < _grid.width; x++) {
         for (int y=0; y < _grid.height; y++) {
