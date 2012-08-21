@@ -8,22 +8,31 @@
 
 #import "ViewController.h"
 #import <AVFoundation/AVFoundation.h>
-#import "letter.h"
-#import "pixel_t.h";
+#import "pixel_t.h"
+#import "BlockGrid.h"
 
 @implementation ViewController
-@synthesize session = _session, textView = _textView;
+@synthesize session = _session, asciiView;
 
 - (void) dealloc {
     [_session release];
-    [_textView release];
+    [asciiView release];
     [super dealloc];
 }
 
+- (void) viewDidLoad {
+    [super viewDidLoad];
+    asciiView = [[ASCIIView alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:asciiView];
+}
+
+- (void) viewDidUnload {
+    self.asciiView = nil;
+    [super viewDidUnload];
+}
+
 - (void) viewDidAppear:(BOOL)animated {
-    
-    [self createTree];
-    
+        
     NSError * error = nil;
     
     AVCaptureSession * session = [[[AVCaptureSession alloc] init] autorelease];
@@ -61,38 +70,6 @@
     self.session = nil;
 }
 
-- (void) createTree {
-    
-    if (treeRoot != NULL) {
-        destroyTree(treeRoot);
-        treeRoot = NULL;
-    }
-    
-    NSString * path = [[NSBundle mainBundle] pathForResource:@"definitions" ofType:@"txt"];
-    NSString * text = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-    
-    NSAssert(![text isEqualToString:@""], @"Could not load definitions.txt");
-    
-    NSArray * lines = [text componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    for (NSString * line in lines) {
-        NSArray * components = [line componentsSeparatedByString:@":"];
-        NSAssert([components count] == 2, @"Incorrect formatting in definitions file at line \"%@\"", line);
-        
-        const char * letterStr = [[components objectAtIndex:0] cString];
-        char * letter = malloc(strlen(letterStr) + 1);
-        strcpy(letter, letterStr);
-        
-        float darkness = [[components objectAtIndex:1] floatValue];
-        
-        if (treeRoot == NULL) {
-            treeRoot = newNode(letter, darkness);
-        } else {
-            insertLetter(treeRoot, letter, darkness);
-        }
-        
-        free(letter);
-    }
-}
 static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  {
     size_t offset = (bytes_per_row * row) + (sizeof(pixel_t) * col);
     return (pixel_t *) ((char *)data + offset);
@@ -110,18 +87,20 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
     
     void * data = CVPixelBufferGetBaseAddress(img);
     
-    //Scaling factor - averages blocks 10px wide x 5 px high
-    int gridRows = 6;
+    //Scaling factor - pixels will be averaged in a block of size (gridRows * gridCols)
+    int gridRows = 5;
     int gridCols = 12;
     
     int gridHeight = height/gridRows;
     int gridWidth = width/gridCols;
     
-    NSMutableString * str = [NSMutableString string];
+    //Video comes in oriented incorrectly, hence the transform here
+    BlockGrid * grid = [[BlockGrid alloc] initWithWidth:gridHeight height:gridWidth];
     
-    //Flip it sideways and mirror it
-    for (int col=0; col<gridWidth; col++) {
-        for (int row=gridHeight-1; row>=0; row--) {
+    block_t block;
+    
+    for (int row=0; row<gridHeight; row++) {
+        for (int col=0; col<gridWidth; col++) {
             float sum = 0;
             for (int pxCol=0; pxCol<gridCols; pxCol++) {
                 for (int pxRow=0; pxRow<gridRows; pxRow++) {
@@ -134,12 +113,15 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
                 }
             }
             sum = sum/(gridCols * gridRows);
-            char * letter = findLetter(treeRoot, sum);
-            //printf("%s", letter);
-            [str appendFormat:@"%s", letter];
+            
+            block.r = sum;
+            block.g = sum;
+            block.b = sum;
+            block.a = 1.0;
+            
+            //See above - video is in the wrong orientation
+            [grid copyBlock:&block toRow:col col:grid.width-row-1];
         }
-        [str appendFormat:@"\n"];
-        //printf("\n");
     }
 
     
@@ -148,7 +130,8 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
     CVPixelBufferUnlockBaseAddress(img, 0);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_textView setText:str];
+        [asciiView setGrid:grid];
+        [grid release];
     });
 }
 

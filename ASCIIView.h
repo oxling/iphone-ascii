@@ -7,12 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BlockGrid.h"
 
 @interface ASCIIView : UIView
 
-@property (nonatomic) int gridWidth;
-@property (nonatomic) int gridHeight;
-
-- (void) setRGB:(float *)components atRow:(int)row col:(int)col;
+@property (nonatomic, retain) BlockGrid * grid;
 
 @end

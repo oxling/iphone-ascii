@@ -8,12 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import "ASCIIView.h"
 
 @interface ViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate> {
-    UITextView * textView;
+    ASCIIView * asciiView;
 }
 
 @property (nonatomic, retain) AVCaptureSession * session;
-@property (nonatomic, retain) IBOutlet UITextView * textView;
+@property (nonatomic, retain) ASCIIView * asciiView;
 
 @end
