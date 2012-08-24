@@ -22,7 +22,7 @@
 
 - (void) viewDidLoad {
     [super viewDidLoad];
-    asciiView = [[ASCIIView alloc] initWithFrame:self.view.bounds];
+    asciiView = [[ASCIIView alloc] initWithFrame:CGRectInset(self.view.bounds, 0, 20)];
     [self.view addSubview:asciiView];
 }
 
@@ -36,7 +36,7 @@
     NSError * error = nil;
     
     AVCaptureSession * session = [[[AVCaptureSession alloc] init] autorelease];
-    session.sessionPreset = AVCaptureSessionPresetMedium;
+    session.sessionPreset = AVCaptureSessionPresetLow;
         
     AVCaptureDevice * device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     AVCaptureDeviceInput * input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
@@ -88,8 +88,8 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
     void * data = CVPixelBufferGetBaseAddress(img);
     
     //Scaling factor - pixels will be averaged in a block of size (gridRows * gridCols)
-    int gridRows = 5;
-    int gridCols = 12;
+    int gridRows = 3;
+    int gridCols = 4;
     
     int gridHeight = height/gridRows;
     int gridWidth = width/gridCols;
@@ -101,26 +101,29 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
     
     for (int row=0; row<gridHeight; row++) {
         for (int col=0; col<gridWidth; col++) {
-            float sum = 0;
+            float sum_r = 0;
+            float sum_g = 0;
+            float sum_b = 0;
+
             for (int pxCol=0; pxCol<gridCols; pxCol++) {
                 for (int pxRow=0; pxRow<gridRows; pxRow++) {
                     pixel_t * px = getPixel(data, row*gridRows+pxRow, col*gridCols+pxCol, bytes_per_row);
                     
-                    float darkness = 0.2126 * px->r + 0.7152 * px->g + 0.0722 * px->b;
-                    sum += darkness/255;
+                    sum_r += (float)px->r/255;
+                    sum_g += (float)px->g/255;
+                    sum_b += (float)px->b/255;
                 }
             }
             
-
-           /* block.r = sum_r/(gridCols*gridRows);
-            block.g = sum_g/(gridCols*gridRows);
-            block.b = sum_b/(gridCols*gridRows); */
             
-            sum /= gridCols * gridRows;
+            int pxtotal = gridCols * gridRows;
+            sum_r /= pxtotal;
+            sum_g /= pxtotal;
+            sum_b /= pxtotal;
             
-            block.r = sum;
-            block.g = sum;
-            block.b = sum;
+            block.r = sum_r;
+            block.g = sum_g;
+            block.b = sum_b;
             block.a = 1.0;
             
             //See above - video is in the wrong orientation

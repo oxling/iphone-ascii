@@ -11,8 +11,8 @@
 
 typedef struct pixel {
     unsigned char b;
-    unsigned char r;
     unsigned char g;
+    unsigned char r;
     unsigned char a;
 } pixel_t;
 

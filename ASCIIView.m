@@ -23,7 +23,7 @@
 - (id) initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor whiteColor];
+        self.backgroundColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
         [self createTree];
     }
     return self;
@@ -48,7 +48,7 @@
 
 #pragma mark - Drawing
 
-- (void) drawBlockAtRow:(int)row col:(int)col inContext:(CGContextRef) ctx {
+- (void) drawBlockAtRow:(int)row col:(int)col inContext:(CGContextRef) ctx colorspace:(CGColorSpaceRef)colorspace {
     CGRect bounds = self.bounds;
     CGFloat blockWidth = bounds.size.width / _grid.width;
     CGFloat blockHeight = bounds.size.height / _grid.height;
@@ -57,33 +57,43 @@
     //See wikipedia article on grayscale
     float darkness = 0.2126 * block.r + 0.7152 * block.g + 0.0722 * block.b;
     char * letter = findLetter(treeRoot, darkness);
-        
-    CGContextSetFillColor(ctx, (CGFloat *)&block);
+    
+    
+    block.a = 0.1;
+    
+    CGColorRef color = CGColorCreate(colorspace, (CGFloat *)&block);
+    CGContextSetFillColorWithColor(ctx, color);
     CGRect rect = CGRectMake(bounds.origin.x + blockWidth * col, bounds.origin.y + blockHeight * row, blockWidth, blockHeight);
     CGContextFillRect(ctx, rect);
     
-    //CGContextShowTextAtPoint(ctx, rect.origin.x, rect.origin.y, letter, strlen(letter));
-    //CGContextFillRect(ctx, rect);
+    block.a = 1.0;
+    CGContextSetFillColor(ctx, (CGFloat *)&block);
+    CGContextShowTextAtPoint(ctx, rect.origin.x, rect.origin.y, letter, strlen(letter));
+    
+    CGColorRelease(color);
     
 }
 
 - (void)drawRect:(CGRect)rect {
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     
-    
     CGContextSetFillColorWithColor(ctx, self.backgroundColor.CGColor);
     CGContextFillRect(ctx, self.bounds);
-    CGContextSelectFont(ctx, "Courier", 8.0, kCGEncodingMacRoman);
+    CGContextSelectFont(ctx, "Courier-Bold", 9.0, kCGEncodingMacRoman);
     CGContextSetCharacterSpacing(ctx, 1.7);
     CGContextSetTextDrawingMode(ctx, kCGTextFill);
     CGAffineTransform transform = CGAffineTransformMake(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
     CGContextSetTextMatrix(ctx, transform);
     
+    CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
+    
     for (int x=0; x < _grid.width; x++) {
         for (int y=0; y < _grid.height; y++) {
-            [self drawBlockAtRow:y col:x inContext:ctx];
+            [self drawBlockAtRow:y col:x inContext:ctx colorspace:colorspace];
         }
     }
+    
+    CGColorSpaceRelease(colorspace);
 }
 
 #pragma mark - ASCII
