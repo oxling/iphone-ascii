@@ -131,9 +131,7 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
         }
     }
 
-    
-    //printf("\n\n");
-    
+        
     CVPixelBufferUnlockBaseAddress(img, 0);
     
     dispatch_async(dispatch_get_main_queue(), ^{

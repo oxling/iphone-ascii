@@ -17,6 +17,7 @@ void setLeftNode(node_t * parent, node_t * leaf);
 void setRightNode(node_t * parent, node_t * leaf);
 node_t * findNode(node_t * root, float darkness, float diff);
 void testNode(node_t * node);
+void printTree();
 
 #pragma mark - Tree creation and navigation
 
@@ -63,7 +64,7 @@ node_t * newNode(char * character, float darkness)
     node_t * newNode = malloc(sizeof(node_t));
     letter_t * newLetter = malloc(sizeof(letter_t));
     
-    newLetter->character = malloc(sizeof(character));
+    newLetter->character = malloc(sizeof(char));
     strcpy(newLetter->character, character);
     newLetter->darkness = darkness;
     
@@ -278,5 +279,7 @@ node_t * findNode(node_t * root, float darkness, float diff)
 char * findLetter(node_t * root, float darkness)
 {
     node_t * node = findNode(root, darkness, 100000);
+    if (node == NULL) return NULL;
+
     return node->letter->character;
 }
