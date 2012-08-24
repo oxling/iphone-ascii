@@ -13,4 +13,6 @@
 
 @property (nonatomic, retain) BlockGrid * grid;
 
+- (UIImage *) takeScreenshot;
+
 @end

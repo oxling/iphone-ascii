@@ -3,7 +3,7 @@
 //  ASCII
 //
 //  Created by Amy Dyer on 8/20/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Amy Dyer. All rights reserved.
 //
 
 #import "ViewController.h"
@@ -11,23 +11,36 @@
 #import "pixel_t.h"
 #import "BlockGrid.h"
 
+@interface ViewController ()
+
+- (void) didTapScreen:(UITapGestureRecognizer *)tapper;
+- (void) showPhotoButton:(BOOL)show;
+
+@end
+
 @implementation ViewController
-@synthesize session = _session, asciiView;
+@synthesize session = _session, asciiView=_asciiView, photoButtonContainer=_photoButtonContainer;
+@synthesize activityView = _activityView, photoButton = _photoButton;
 
 - (void) dealloc {
     [_session release];
-    [asciiView release];
+    [_asciiView release];
+    [_photoButtonContainer release];
+    [_activityView release];
+    [_photoButton release];
     [super dealloc];
 }
 
 - (void) viewDidLoad {
     [super viewDidLoad];
-    asciiView = [[ASCIIView alloc] initWithFrame:CGRectInset(self.view.bounds, 0, 20)];
-    [self.view addSubview:asciiView];
 }
 
 - (void) viewDidUnload {
     self.asciiView = nil;
+    self.photoButtonContainer = nil;
+    self.activityView = nil;
+    self.photoButton = nil;
+    
     [super viewDidUnload];
 }
 
@@ -36,7 +49,7 @@
     NSError * error = nil;
     
     AVCaptureSession * session = [[[AVCaptureSession alloc] init] autorelease];
-    session.sessionPreset = AVCaptureSessionPresetLow;
+    session.sessionPreset = AVCaptureSessionPresetMedium;
         
     AVCaptureDevice * device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     AVCaptureDeviceInput * input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
@@ -49,6 +62,7 @@
     [session addInput:input];
     
     AVCaptureVideoDataOutput * output = [[AVCaptureVideoDataOutput alloc] init];
+    output.alwaysDiscardsLateVideoFrames = YES;
     [session addOutput:output];
     [output release];
     
@@ -63,6 +77,11 @@
     
     [session startRunning];
     self.session = session;
+    
+    UITapGestureRecognizer * tapper = [[UITapGestureRecognizer alloc] init];
+    [tapper addTarget:self action:@selector(didTapScreen:)];
+    [self.asciiView addGestureRecognizer:tapper];
+    [tapper release];
 }
 
 - (void) viewDidDisappear:(BOOL)animated {
@@ -88,8 +107,8 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
     void * data = CVPixelBufferGetBaseAddress(img);
     
     //Scaling factor - pixels will be averaged in a block of size (gridRows * gridCols)
-    int gridRows = 3;
-    int gridCols = 4;
+    int gridRows = 6;
+    int gridCols = 8;
     
     int gridHeight = height/gridRows;
     int gridWidth = width/gridCols;
@@ -109,17 +128,17 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
                 for (int pxRow=0; pxRow<gridRows; pxRow++) {
                     pixel_t * px = getPixel(data, row*gridRows+pxRow, col*gridCols+pxCol, bytes_per_row);
                     
-                    sum_r += (float)px->r/255;
-                    sum_g += (float)px->g/255;
-                    sum_b += (float)px->b/255;
+                    sum_r += px->r;
+                    sum_g += px->g;
+                    sum_b += px->b;
                 }
             }
             
             
             int pxtotal = gridCols * gridRows;
-            sum_r /= pxtotal;
-            sum_g /= pxtotal;
-            sum_b /= pxtotal;
+            sum_r /= pxtotal * 255;
+            sum_g /= pxtotal * 255;
+            sum_b /= pxtotal * 255;
             
             block.r = sum_r;
             block.g = sum_g;
@@ -135,7 +154,7 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
     CVPixelBufferUnlockBaseAddress(img, 0);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [asciiView setGrid:grid];
+        [_asciiView setGrid:grid];
         [grid release];
     });
 }
@@ -144,6 +163,61 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+- (void) takePhoto:(id)sender {    
+    _photoButton.hidden = YES;
+    [_activityView startAnimating];
+    
+    BlockGrid * grid = _asciiView.grid;
+    [grid retain];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        ASCIIView * view = [[ASCIIView alloc] initWithFrame:self.asciiView.frame];
+        view.grid = grid;
+        
+        UIImage * image = [view takeScreenshot];
+        UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+        
+        [grid release];
+        [view release];
+    });
+    
+    
+    
+}
+
+- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
+        
+    [self showPhotoButton:NO];
+    [_activityView stopAnimating];
+    
+}
+
+- (void) showPhotoButton:(BOOL)show {
+    if (show) {
+        _photoButtonContainer.alpha = 0;
+        _photoButtonContainer.hidden = NO;
+        
+        [UIView animateWithDuration:0.25 animations:^{
+            _photoButtonContainer.alpha = 1.0;
+        } completion:^(BOOL finished) {
+            _photoButton.hidden = NO;
+        }];
+    } else {
+        [UIView animateWithDuration:0.25 animations:^{
+            _photoButtonContainer.alpha = 0.0;
+        } completion:^(BOOL finished) {
+            _photoButtonContainer.hidden = YES;
+        }];
+    }
+}
+- (void) didTapScreen:(UITapGestureRecognizer *)tapper {
+    if (_photoButtonContainer.hidden == NO) {
+        [self showPhotoButton:NO];
+    } else {
+        [self showPhotoButton:YES];
+    }
 }
 
 @end

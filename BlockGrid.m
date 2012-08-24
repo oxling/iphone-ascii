@@ -46,20 +46,17 @@
 - (void) copyBlock:(block_t *)block toRow:(int)row col:(int)col {
     NSAssert(col < _width && row < _height, @"Tried to set block (%i, %i) outside of range (%i, %i)", col, row, _width, _height);
     
-    @synchronized(self) {
-        size_t offset = _width * row + col;
-        memcpy(_blocks + offset, block, sizeof(block_t));
-    }
+    size_t offset = _width * row + col;
+    memcpy(_blocks + offset, block, sizeof(block_t));
 }
 
 - (block_t) blockAtRow:(int)row col:(int)col {
     NSAssert(col < _width && row < _height, @"Tried to retrieve block (%i, %i) outside of range (%i, %i)", col, row, _width, _height);
     
     block_t result;
-    @synchronized(self) {
-        size_t offset = _width * row + col;
-        result = *(_blocks + offset);
-    }
+    size_t offset = _width * row + col;
+    result = *(_blocks + offset);
+
     return result;
 }
 

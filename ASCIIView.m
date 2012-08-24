@@ -8,8 +8,11 @@
 
 #import "ASCIIView.h"
 #import "letter.h"
+#import <QuartzCore/QuartzCore.h>
 
-@interface ASCIIView ()
+@interface ASCIIView () {
+    CGRect _bounds;
+}
 
 - (void) createTree;
 
@@ -20,11 +23,26 @@
 
 #pragma mark - Memory management
 
+- (void) initializeVariables {
+    self.backgroundColor = [UIColor blackColor];
+    [self createTree];
+    _bounds = self.bounds;
+    
+    self.layer.contents = (id) [UIImage imageNamed:@"Default.png"].CGImage;
+}
+
 - (id) initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
+    if (self) {        
+        [self initializeVariables];
+    }
+    return self;
+}
+
+- (id) initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
     if (self) {
-        self.backgroundColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
-        [self createTree];
+        [self initializeVariables];
     }
     return self;
 }
@@ -46,39 +64,33 @@
     [self setNeedsDisplay];
 }
 
+- (void) setBounds:(CGRect)bounds {
+    [super setBounds:bounds];
+    _bounds = bounds;
+}
+
 #pragma mark - Drawing
 
 - (void) drawBlockAtRow:(int)row col:(int)col inContext:(CGContextRef) ctx colorspace:(CGColorSpaceRef)colorspace {
-    CGRect bounds = self.bounds;
-    CGFloat blockWidth = bounds.size.width / _grid.width;
-    CGFloat blockHeight = bounds.size.height / _grid.height;
+    CGFloat blockWidth = _bounds.size.width / _grid.width;
+    CGFloat blockHeight = _bounds.size.height / _grid.height;
     
     block_t block = [_grid blockAtRow:row col:col];
     //See wikipedia article on grayscale
-    float darkness = 0.2126 * block.r + 0.7152 * block.g + 0.0722 * block.b;
+    float darkness = 1 - (0.2126 * block.r + 0.7152 * block.g + 0.0722 * block.b);
     char * letter = findLetter(treeRoot, darkness);
     
-    
-    block.a = 0.1;
-    
-    CGColorRef color = CGColorCreate(colorspace, (CGFloat *)&block);
-    CGContextSetFillColorWithColor(ctx, color);
-    CGRect rect = CGRectMake(bounds.origin.x + blockWidth * col, bounds.origin.y + blockHeight * row, blockWidth, blockHeight);
-    CGContextFillRect(ctx, rect);
+    CGRect rect = CGRectMake(_bounds.origin.x + blockWidth * col, _bounds.origin.y + blockHeight * row, blockWidth, blockHeight);
     
     block.a = 1.0;
     CGContextSetFillColor(ctx, (CGFloat *)&block);
     CGContextShowTextAtPoint(ctx, rect.origin.x, rect.origin.y, letter, strlen(letter));
-    
-    CGColorRelease(color);
-    
+        
 }
 
 - (void)drawRect:(CGRect)rect {
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     
-    CGContextSetFillColorWithColor(ctx, self.backgroundColor.CGColor);
-    CGContextFillRect(ctx, self.bounds);
     CGContextSelectFont(ctx, "Courier-Bold", 9.0, kCGEncodingMacRoman);
     CGContextSetCharacterSpacing(ctx, 1.7);
     CGContextSetTextDrawingMode(ctx, kCGTextFill);
@@ -96,38 +108,42 @@
     CGColorSpaceRelease(colorspace);
 }
 
+- (UIImage *) takeScreenshot {
+    UIGraphicsBeginImageContextWithOptions(self.bounds.size, YES, 0.0);
+    [self.layer renderInContext:UIGraphicsGetCurrentContext()];
+    
+    return UIGraphicsGetImageFromCurrentImageContext();
+}
+
 #pragma mark - ASCII
 
 - (void) createTree {
     
-    if (treeRoot != NULL) {
-        destroyTree(treeRoot);
-        treeRoot = NULL;
-    }
-    
-    NSString * path = [[NSBundle mainBundle] pathForResource:@"definitions" ofType:@"txt"];
-    NSString * text = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
-    
-    NSAssert(![text isEqualToString:@""], @"Could not load definitions.txt");
-    
-    NSArray * lines = [text componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    for (NSString * line in lines) {
-        NSArray * components = [line componentsSeparatedByString:@":"];
-        NSAssert([components count] == 2, @"Incorrect formatting in definitions file at line \"%@\"", line);
+    if (treeRoot == NULL) {
+        NSString * path = [[NSBundle mainBundle] pathForResource:@"definitions" ofType:@"txt"];
+        NSString * text = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
         
-        const char * letterStr = [[components objectAtIndex:0] cString];
-        char * letter = malloc(strlen(letterStr) + 1);
-        strcpy(letter, letterStr);
+        NSAssert(![text isEqualToString:@""], @"Could not load definitions.txt");
         
-        float darkness = [[components objectAtIndex:1] floatValue];
-        
-        if (treeRoot == NULL) {
-            treeRoot = newNode(letter, darkness);
-        } else {
-            insertLetter(treeRoot, letter, darkness);
+        NSArray * lines = [text componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+        for (NSString * line in lines) {
+            NSArray * components = [line componentsSeparatedByString:@":"];
+            NSAssert([components count] == 2, @"Incorrect formatting in definitions file at line \"%@\"", line);
+            
+            const char * letterStr = [[components objectAtIndex:0] cString];
+            char * letter = malloc(strlen(letterStr) + 1);
+            strcpy(letter, letterStr);
+            
+            float darkness = [[components objectAtIndex:1] floatValue];
+            
+            if (treeRoot == NULL) {
+                treeRoot = newNode(letter, darkness);
+            } else {
+                insertLetter(treeRoot, letter, darkness);
+            }
+            
+            free(letter);
         }
-        
-        free(letter);
     }
 }
 
