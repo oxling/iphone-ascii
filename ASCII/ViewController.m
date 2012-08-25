@@ -97,9 +97,6 @@
     [output setSampleBufferDelegate:self queue:queue];
     dispatch_release(queue);
     
-    AVCaptureConnection * connection = [output connectionWithMediaType:AVMediaTypeVideo];
-    connection.videoMinFrameDuration = CMTimeMake(1, 1/3);
-    
     [session startRunning];
     self.session = session;
 }
@@ -109,7 +106,7 @@
     self.session = nil;
 }
 
-static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  {
+static inline pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  {
     size_t offset = (bytes_per_row * row) + (sizeof(pixel_t) * col);
     return (pixel_t *) ((char *)data + offset);
 }
@@ -173,7 +170,8 @@ static pixel_t * getPixel(void * data, int row, int col, size_t bytes_per_row)  
         
     CVPixelBufferUnlockBaseAddress(img, 0);
     
-    dispatch_async(dispatch_get_main_queue(), ^{
+    //Block here briefly - the video session output will handle dropping frames while it waits
+    dispatch_sync(dispatch_get_main_queue(), ^{
         [_asciiView setGrid:grid];
         [grid release];
     });
