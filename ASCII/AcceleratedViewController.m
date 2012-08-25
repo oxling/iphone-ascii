@@ -26,21 +26,14 @@ NSString *const fragmentString = SHADER_STRING
  void main() {     
      highp vec2 sampleDivisor = vec2(samplePercent, samplePercent);
      highp vec2 samplePos = textureCoordinate - mod(textureCoordinate, sampleDivisor) + 0.5 * sampleDivisor;
-    
-     lowp vec4 sampleColor = texture2D(inputImageTexture, samplePos);
-     lowp vec4 originalColor = texture2D(inputImageTexture, textureCoordinate);
      
-     lowp float darkness = (originalColor.r + originalColor.b + originalColor.g) * 0.333;
-     lowp vec4 outputColor;
+     lowp vec4 color = texture2D(inputImageTexture, samplePos);
+     lowp float dotScaling = (color.r + color.g + color.b) * 0.333; //size of dot is relative to darkness
      
-     outputColor.r = darkness;
-     outputColor.g = darkness;
-     outputColor.b = darkness;
-     outputColor.a = 1.0;
+     highp float distanceFromSamplePoint = distance(samplePos, textureCoordinate);
+     lowp float checkForPresenceWithinDot = step(distanceFromSamplePoint, (samplePercent * 0.5) * dotScaling);
      
-     outputColor = outputColor * sampleColor;
-     
-     gl_FragColor = outputColor;
+     gl_FragColor = vec4( vec3(1.0, 1.0, 1.0) * checkForPresenceWithinDot, 1.0);
  }
  
 );
@@ -49,7 +42,7 @@ NSString *const fragmentString = SHADER_STRING
     self = [super initWithFragmentShaderFromString:fragmentString];
     if (self) {
         samplePercentUniform = [filterProgram uniformIndex:@"samplePercent"];
-        [self setFloat:0.025 forUniform:samplePercentUniform program:filterProgram];
+        [self setFloat:0.015 forUniform:samplePercentUniform program:filterProgram];
     }
     return self;
 }
