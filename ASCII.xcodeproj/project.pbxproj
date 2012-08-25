@@ -13,6 +13,11 @@
 		E169096915E80B5400B46E6A /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E169096715E80B5300B46E6A /* Icon@2x.png */; };
 		E169096C15E80C4600B46E6A /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = E169096A15E80C4600B46E6A /* Default.png */; };
 		E169096D15E80C4600B46E6A /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E169096B15E80C4600B46E6A /* Default@2x.png */; };
+		E17A695715E9303400B69DF2 /* libGPUImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E17A695615E9303400B69DF2 /* libGPUImage.a */; };
+		E17A695915E9304800B69DF2 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E17A695815E9304800B69DF2 /* OpenGLES.framework */; };
+		E17A696E15E932C500B69DF2 /* AcceleratedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E17A696D15E932C500B69DF2 /* AcceleratedViewController.m */; };
+		E17A697015E9344400B69DF2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E17A696F15E9344400B69DF2 /* QuartzCore.framework */; };
+		E17A697215E9345F00B69DF2 /* ASCII-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E17A697115E9345F00B69DF2 /* ASCII-Info.plist */; };
 		E1C9353C15E2B980001E7060 /* letter.c in Sources */ = {isa = PBXBuildFile; fileRef = E1C9353815E2B980001E7060 /* letter.c */; };
 		E1C9353F15E2BC07001E7060 /* definitions.txt in Resources */ = {isa = PBXBuildFile; fileRef = E1C9353E15E2BC07001E7060 /* definitions.txt */; };
 		E1D2974115E293060081BC29 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1D2974015E293060081BC29 /* UIKit.framework */; };
@@ -38,6 +43,12 @@
 		E169096715E80B5300B46E6A /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		E169096A15E80C4600B46E6A /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		E169096B15E80C4600B46E6A /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		E17A695615E9303400B69DF2 /* libGPUImage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGPUImage.a; path = "GPUImage/build/Release-iphoneos/libGPUImage.a"; sourceTree = "<group>"; };
+		E17A695815E9304800B69DF2 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		E17A696C15E932C500B69DF2 /* AcceleratedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AcceleratedViewController.h; sourceTree = "<group>"; };
+		E17A696D15E932C500B69DF2 /* AcceleratedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AcceleratedViewController.m; sourceTree = "<group>"; };
+		E17A696F15E9344400B69DF2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		E17A697115E9345F00B69DF2 /* ASCII-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ASCII-Info.plist"; sourceTree = "<group>"; };
 		E1C9353815E2B980001E7060 /* letter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = letter.c; sourceTree = "<group>"; };
 		E1C9353915E2B980001E7060 /* letter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = letter.h; sourceTree = "<group>"; };
 		E1C9353E15E2BC07001E7060 /* definitions.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = definitions.txt; sourceTree = "<group>"; };
@@ -45,7 +56,6 @@
 		E1D2974015E293060081BC29 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E1D2974215E293060081BC29 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E1D2974415E293060081BC29 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		E1D2974815E293060081BC29 /* ASCII-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ASCII-Info.plist"; sourceTree = "<group>"; };
 		E1D2974A15E293060081BC29 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E1D2974C15E293060081BC29 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E1D2974E15E293060081BC29 /* ASCII-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ASCII-Prefix.pch"; sourceTree = "<group>"; };
@@ -64,7 +74,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E17A697015E9344400B69DF2 /* QuartzCore.framework in Frameworks */,
 				E1D2976215E295340081BC29 /* CoreMedia.framework in Frameworks */,
+				E17A695915E9304800B69DF2 /* OpenGLES.framework in Frameworks */,
+				E17A695715E9303400B69DF2 /* libGPUImage.a in Frameworks */,
 				E1D2976015E2952F0081BC29 /* CoreVideo.framework in Frameworks */,
 				E1D2975E15E2932B0081BC29 /* AVFoundation.framework in Frameworks */,
 				E1D2974115E293060081BC29 /* UIKit.framework in Frameworks */,
@@ -117,6 +130,9 @@
 		E1D2973F15E293060081BC29 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E17A696F15E9344400B69DF2 /* QuartzCore.framework */,
+				E17A695815E9304800B69DF2 /* OpenGLES.framework */,
+				E17A695615E9303400B69DF2 /* libGPUImage.a */,
 				E1D2976115E295340081BC29 /* CoreMedia.framework */,
 				E1D2975F15E2952F0081BC29 /* CoreVideo.framework */,
 				E1D2975D15E2932B0081BC29 /* AVFoundation.framework */,
@@ -132,6 +148,8 @@
 			children = (
 				E169096F15E8302600B46E6A /* ASCII Generation */,
 				E169096E15E8301A00B46E6A /* Images */,
+				E17A696C15E932C500B69DF2 /* AcceleratedViewController.h */,
+				E17A696D15E932C500B69DF2 /* AcceleratedViewController.m */,
 				E1D2974F15E293060081BC29 /* AppDelegate.h */,
 				E1D2975015E293060081BC29 /* AppDelegate.m */,
 				E1D2975215E293060081BC29 /* ViewController.h */,
@@ -150,7 +168,7 @@
 		E1D2974715E293060081BC29 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				E1D2974815E293060081BC29 /* ASCII-Info.plist */,
+				E17A697115E9345F00B69DF2 /* ASCII-Info.plist */,
 				E1D2974915E293060081BC29 /* InfoPlist.strings */,
 				E1D2974C15E293060081BC29 /* main.m */,
 				E1D2974E15E293060081BC29 /* ASCII-Prefix.pch */,
@@ -215,6 +233,7 @@
 				E169096915E80B5400B46E6A /* Icon@2x.png in Resources */,
 				E169096C15E80C4600B46E6A /* Default.png in Resources */,
 				E169096D15E80C4600B46E6A /* Default@2x.png in Resources */,
+				E17A697215E9345F00B69DF2 /* ASCII-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,6 +250,7 @@
 				E1C9353C15E2B980001E7060 /* letter.c in Sources */,
 				E116939915E2E59E00236C88 /* ASCIIView.m in Sources */,
 				E116939D15E3DD9600236C88 /* BlockGrid.m in Sources */,
+				E17A696E15E932C500B69DF2 /* AcceleratedViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,9 +322,11 @@
 		E1D2975B15E293060081BC29 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ASCII/ASCII-Prefix.pch";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/GPUImage/framework/Source\"";
 				INFOPLIST_FILE = "ASCII/ASCII-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -315,9 +337,11 @@
 		E1D2975C15E293060081BC29 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ASCII/ASCII-Prefix.pch";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/GPUImage/framework/Source\"";
 				INFOPLIST_FILE = "ASCII/ASCII-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
